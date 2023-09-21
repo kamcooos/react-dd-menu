@@ -28,4 +28,6 @@ node_modules
 .sass-cache
 
 example/www
+example/build
 !example/www/indexTemplate.html
+.idea

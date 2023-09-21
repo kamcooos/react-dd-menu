@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
-import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import TransitionGroup from 'react-transition-group/TransitionGroup';
+import CSSTransition from 'react-transition-group/CSSTransition';
 import classnames from 'classnames';
 
 const TAB = 9;
@@ -82,13 +83,13 @@ export default class DropdownMenu extends PureComponent {
 
   close = (e) => {
     // ensure eventual event handlers registered by consumers via React props are evaluated first
-    setTimeout(() => this.props.close(e))
-  }
+    setTimeout(() => this.props.close(e));
+  };
 
   handleMenuItemKeyDown = (e) => {
     const key = e.which || e.keyCode;
     if(key === SPACEBAR) {
-      this.close(e)
+      this.close(e);
       e.preventDefault();
     }
   };
@@ -109,7 +110,7 @@ export default class DropdownMenu extends PureComponent {
       target = target.parentNode;
     }
 
-    this.close(e)
+    this.close(e);
   };
 
   handleKeyDown = (e) => {
@@ -122,7 +123,7 @@ export default class DropdownMenu extends PureComponent {
     const id = e.shiftKey ? 1 : items.length - 1;
 
     if(e.target === items[id]) {
-      this.close(e)
+      this.close(e);
     }
   };
 
@@ -142,24 +143,31 @@ export default class DropdownMenu extends PureComponent {
 
     const listClassName = 'dd-items-' + (textAlign || align);
     const transitionProps = {
-      transitionName: 'grow-from-' + (upwards ? 'up-' : '') + (animAlign || align),
-      component: 'div',
-      className: classnames('dd-menu-items', { 'dd-items-upwards': upwards }),
-      onKeyDown: this.handleKeyDown,
-      transitionEnter: animate,
-      transitionLeave: animate,
-      transitionEnterTimeout: enterTimeout,
-      transitionLeaveTimeout: leaveTimeout,
+      // onKeyDown: this.handleKeyDown,
+      classNames: 'grow-from-' + (upwards ? 'up-' : '') + (animAlign || align),
+      enter: animate,
+      exit: animate,
+      timeout: { exit: leaveTimeout, enter: enterTimeout},
     };
+
+    const childrenWithProps = React.Children.map(this.props.children, child => {
+      if (React.isValidElement(child)) {
+        return React.cloneElement(child, {onKeyDown: this.handleKeyDown});
+      }
+    });
 
     return (
       <div className={menuClassName}>
         {this.props.toggle}
-        <CSSTransitionGroup {...transitionProps}>
+        <TransitionGroup component={'div'} className={classnames('dd-menu-items', { 'dd-items-upwards': upwards })} >
           {this.props.isOpen &&
-          <ul key="items" className={listClassName}>{this.props.children}</ul>
+            <CSSTransition {...transitionProps}>
+              <ul key="items" className={listClassName}>
+                {childrenWithProps}
+              </ul>
+            </CSSTransition>
           }
-        </CSSTransitionGroup>
+        </TransitionGroup>
       </div>
     );
   }

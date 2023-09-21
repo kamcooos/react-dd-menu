@@ -2,131 +2,123 @@
 /*eslint-env node*/
 const webpack = require('webpack');
 const path = require('path');
-const autoprefixer = require('autoprefixer');
-const OpenBrowserPlugin = require('open-browser-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const NODE_ENV = process.env.NODE_ENV;
-const buildFolder = path.resolve(__dirname, 'www');
-const js = path.resolve(__dirname, '../src/js');
-const nodeModules = path.resolve(__dirname, 'node_modules');
+const buildFolder = path.resolve(__dirname, 'build');
 
 const env = {
   development: NODE_ENV === 'development' || typeof NODE_ENV === 'undefined',
   production: NODE_ENV === 'production',
 };
 
-const preSuffix = env.production ? '.min' : '';
-
-let config = {
+const config = {
+  devtool: 'source-map',
+  performance: {
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000
+  },
   entry: [
-    './src/js/index.jsx',
+    '@babel/polyfill',
+    './src/js/index.jsx'
   ],
-
-  module: {
-    preLoaders: [{
-      test: /\.(js|jsx)$/,
-      loader: 'eslint',
-      include: [js],
-      exclude: /node_modules/,
-    }],
-
-    loaders: [{
-      test: /\.jsx?$/,
-      exclude: /node_modules/,
-      loader: `${env.development ? 'react-hot!': ''}babel`,
-    }],
-  },
-
-  modulesDirectories: [
-    path.resolve(__dirname, 'node_modules'),
-    'node_modules',
-    js,
-  ],
-
-  resolve: {
-    extensions: ['', '.js', '.jsx', '.scss'],
-    alias: {
-      'react': path.resolve(__dirname, 'node_modules/react'),
-      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
-      'react-dd-menu': js,
-    },
-
-    fallback: nodeModules,
-  },
-
-  resolveLoader: {
-    fallback: nodeModules,
-  },
-
   output: {
     path: buildFolder,
-    filename: `bundle${preSuffix}.js`,
+    filename: `[name].[contenthash].js`,
+    publicPath: '/'
   },
-
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'www/indexTemplate.html'),
-      inject: 'body',
-    }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify(NODE_ENV || 'development'),
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        use: [
+          {loader: 'babel-loader'},
+        ],
+        exclude: /node_modules\/(?!qs)/
       },
+      {
+        test: /\.scss$/,
+        use: [
+          env.development ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'
+        ],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          env.development ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader',
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    "autoprefixer",
+                    {
+                      // Options
+                    },
+                  ],
+                ],
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(woff(2)?|ttf|eot|svg|png|jpg|otf)(\?v=\d+\.\d+\.\d+)?$/,
+        type: 'asset',
+      }
+    ]
+  },
+  resolve: {
+        extensions: ['', '.js', '.jsx', '.scss'],
+  },
+  optimization: {
+    runtimeChunk: true,
+    moduleIds: 'deterministic',
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+          enforce: true
+        }
+      }
+    }
+  },
+  plugins: [
+    new webpack.NoEmitOnErrorsPlugin(),
+    new ESLintPlugin(),
+    new HtmlWebpackPlugin({
+      template: 'www/indexTemplate.html',
+      title: 'React Dropdown Menu Example',
+      showErrors: true,
+      xhtml: true,
+      inject: 'body', // true | 'head' | 'body' | false
+      minify: {}
     }),
-  ],
-  eslint: {
-    configFile: '../.eslintrc',
-  },
-
-  postcss: function() {
-    return [autoprefixer];
-  },
+    new MiniCssExtractPlugin({
+      filename: env.development ? '[name].css' : '[name].[contenthash].css'
+    })
+  ]
 };
 
 if(env.development) {
   const host = 'localhost';
   const port = 8080;
   const DEV_URL = `http://${host}:${port}`;
-  config.devtool = 'eval';
-  config.entry = config.entry.concat([
-    `webpack-dev-server/client?${DEV_URL}`,
-    'webpack/hot/only-dev-server',
-  ]);
-  config.cache = true;
-
+  config.mode = 'development';
   config.devServer = {
-    contentBase: buildFolder,
-    devtool: 'eval',
-    hot: true,
-    port: port,
-  };
-
-  config.plugins = config.plugins.concat([
-    new webpack.HotModuleReplacementPlugin(),
-    new OpenBrowserPlugin({ url: DEV_URL }),
-  ]);
-
-  config.module.loaders = config.module.loaders.concat([{
-    test: /\.scss$/,
-    loader: `style!css!postcss!sass?outputStyle=expanded&sourceMap=true`,
-  }]);
-} else if(env.production) {
-  config.devtool = 'source-map';
-  config.module.loaders = config.module.loaders.concat([{
-    test: /\.scss$/,
-    loader: ExtractTextPlugin.extract('style', 'css!postcss!sass?outputStyle=compressed'),
-  }]);
-  config.plugins = config.plugins.concat([
-    new ExtractTextPlugin(`[name]${preSuffix}.css`),
-    new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false },
-      output: { comments: false },
-    }),
-  ]);
+    static: {
+      directory: buildFolder
+    },
+    compress: true,
+      port: port,
+      open: DEV_URL
+  }
 }
 
-module.exports = config;
+module.exports=config;
+

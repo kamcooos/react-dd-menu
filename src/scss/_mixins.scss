@@ -49,12 +49,12 @@
     }
   }
 
-  .grow-from-#{$dir}-leave {
+  .grow-from-#{$dir}-exit {
     transform: scale(1);
     transform-origin: unquote($origin);
     transition: transform $dd-transition-time $dd-transition-out;
 
-    &.grow-from-#{$dir}-leave-active {
+    &.grow-from-#{$dir}-exit-active {
       transform: scale(0);
     }
   }

@@ -1,20 +1,23 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.NestedDropdownMenu = exports.DropdownMenu = undefined;
-
-var _DropdownMenu = require('./DropdownMenu');
-
-var _DropdownMenu2 = _interopRequireDefault(_DropdownMenu);
-
-var _NestedDropdownMenu2 = require('./NestedDropdownMenu');
-
-var _NestedDropdownMenu3 = _interopRequireDefault(_NestedDropdownMenu2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _DropdownMenu2.default;
-exports.DropdownMenu = _DropdownMenu2.default;
-exports.NestedDropdownMenu = _NestedDropdownMenu3.default;
+Object.defineProperty(exports, "DropdownMenu", {
+  enumerable: true,
+  get: function get() {
+    return _DropdownMenu["default"];
+  }
+});
+Object.defineProperty(exports, "NestedDropdownMenu", {
+  enumerable: true,
+  get: function get() {
+    return _NestedDropdownMenu["default"];
+  }
+});
+exports["default"] = void 0;
+var _DropdownMenu = _interopRequireDefault(require("./DropdownMenu"));
+var _NestedDropdownMenu = _interopRequireDefault(require("./NestedDropdownMenu"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var _default = _DropdownMenu["default"];
+exports["default"] = _default;

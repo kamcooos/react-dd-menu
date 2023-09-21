@@ -298,3 +298,4 @@ This will output all the css and js files into `./dist`;
 - 2.0.0 - Removed PureRenderMixin peerDependecy and switched to PureComponent instead.
 - 2.0.1 - Updated for React 15.5
 - 2.0.2 - Small bugfix for any child elements that had onClick handlers. [#52]
+- 2.0.3 - Upgraded project dependencies to their latest versions as of 09/21/2023

@@ -1,8 +1,9 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import classnames from 'classnames';
 
 import Options from './Options';
 import DropdownMenu, { NestedDropdownMenu } from 'react-dd-menu';
+import * as PropTypes from "prop-types";
 
 class Example extends Component {
   render() {
