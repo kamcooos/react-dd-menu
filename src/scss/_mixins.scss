@@ -1,3 +1,5 @@
+@use './variables';
+
 @mixin nested-position($dir, $padding) {
   @if $dir != 'center' {
     $swapped: if($dir == 'left', 'right', 'left');
@@ -18,11 +20,11 @@
   &.dd-menu-#{$dir} .dd-menu-items {
     #{$dir}: 0;
 
-    @include nested-position($dir, $nested-dd-padding);
+    @include nested-position($dir, variables.$nested-dd-padding);
   }
 
   &.dd-menu-#{$dir}.dd-menu-inverse .dd-menu-items {
-    @include nested-position($dir, $nested-dd-inverse-padding);
+    @include nested-position($dir, variables.$nested-dd-inverse-padding);
   }
 }
 
@@ -33,7 +35,7 @@
 }
 
 @mixin dd-sizes() {
-  @each $size in $dd-menu-sizes {
+  @each $size in variables.$dd-menu-sizes {
     @include dd-size(nth($size, 1), nth($size, 2));
   }
 }
@@ -42,7 +44,7 @@
   .grow-from-#{$dir}-enter {
     transform: scale(0);
     transform-origin: unquote($origin);
-    transition: transform $dd-transition-time $dd-transition-in;
+    transition: transform variables.$dd-transition-time variables.$dd-transition-in;
 
     &.grow-from-#{$dir}-enter-active {
       transform: scale(1);
@@ -52,7 +54,7 @@
   .grow-from-#{$dir}-exit {
     transform: scale(1);
     transform-origin: unquote($origin);
-    transition: transform $dd-transition-time $dd-transition-out;
+    transition: transform variables.$dd-transition-time variables.$dd-transition-out;
 
     &.grow-from-#{$dir}-exit-active {
       transform: scale(0);
