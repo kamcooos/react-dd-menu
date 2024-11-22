@@ -1,4 +1,5 @@
 @use './variables';
+@use 'sass:string';
 
 @mixin nested-position($dir, $padding) {
   @if $dir != 'center' {
@@ -43,7 +44,7 @@
 @mixin dd-transition($dir, $origin) {
   .grow-from-#{$dir}-enter {
     transform: scale(0);
-    transform-origin: unquote($origin);
+    transform-origin: string.unquote($origin);
     transition: transform variables.$dd-transition-time variables.$dd-transition-in;
 
     &.grow-from-#{$dir}-enter-active {
@@ -53,7 +54,7 @@
 
   .grow-from-#{$dir}-exit {
     transform: scale(1);
-    transform-origin: unquote($origin);
+    transform-origin: string.unquote($origin);
     transition: transform variables.$dd-transition-time variables.$dd-transition-out;
 
     &.grow-from-#{$dir}-exit-active {

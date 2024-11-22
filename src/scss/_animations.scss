@@ -1,6 +1,7 @@
 @use './variables';
 @use './mixins';
+@use 'sass:list';
 
 @each $transition in variables.$dd-transitions {
-  @include mixins.dd-transition(nth($transition, 1), nth($transition, 2));
+  @include mixins.dd-transition(list.nth($transition, 1), list.nth($transition, 2));
 }
