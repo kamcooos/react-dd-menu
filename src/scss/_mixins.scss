@@ -1,5 +1,6 @@
 @use './variables';
 @use 'sass:string';
+@use 'sass:list';
 
 @mixin nested-position($dir, $padding) {
   @if $dir != 'center' {
@@ -37,7 +38,7 @@
 
 @mixin dd-sizes() {
   @each $size in variables.$dd-menu-sizes {
-    @include dd-size(nth($size, 1), nth($size, 2));
+    @include dd-size(list.nth($size, 1), list.nth($size, 2));;
   }
 }
 
